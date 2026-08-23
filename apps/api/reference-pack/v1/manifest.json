@@ -1,0 +1,18 @@
+{
+  "version": "starter-v0",
+  "status": "starter",
+  "purpose": "Development-only reference pack. Replace with the official UniHack resources before benchmark evaluation.",
+  "artifacts": {
+    "expected_output_schema": null,
+    "manufacturer_master": "manufacturers.json",
+    "brand_master": "brands.json",
+    "lov": null,
+    "uom": null,
+    "content_guidelines": null
+  },
+  "source_policy": {
+    "manufacturer_domains_only": true,
+    "allow_marketplace_sources": false,
+    "require_evidence_for_technical_claims": true
+  }
+}

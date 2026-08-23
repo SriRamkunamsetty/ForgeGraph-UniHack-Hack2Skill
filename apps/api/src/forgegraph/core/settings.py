@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     )
     api_prefix: str = "/api/v1"
     log_level: str = "INFO"
-    cors_origins: str = "http://localhost:3000"
+    cors_origins: str = "http://localhost:3000,https://forgegraph-unihack-hack2skill.vercel.app"
     max_upload_bytes: int = 25 * 1024 * 1024
     max_rows_per_job: int = 10_000
     allowed_upload_extensions: str = ".csv,.xlsx"

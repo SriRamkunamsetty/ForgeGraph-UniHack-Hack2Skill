@@ -16,7 +16,15 @@ class ReferencePack:
 
 class ReferencePackLoader:
     def __init__(self, root: Path | None = None) -> None:
-        self.root = root or Path(__file__).resolve().parents[5] / "reference-pack"
+        if root is not None:
+            self.root = root
+            return
+        candidates = [
+            Path(__file__).resolve().parents[5] / "reference-pack",
+            Path(__file__).resolve().parents[3] / "reference-pack",
+            Path.cwd() / "reference-pack",
+        ]
+        self.root = next((path for path in candidates if path.exists()), candidates[0])
 
     def load(self, version: str = "v1") -> ReferencePack:
         pack_dir = self.root / version
