@@ -2,7 +2,7 @@
 
 import { ChangeEvent, useState } from "react";
 
-const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://forgegraph-api.vercel.app";
+const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://forgegraph-api-root.vercel.app";
 
 type Job = {
   id: string;
