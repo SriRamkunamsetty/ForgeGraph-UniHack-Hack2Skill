@@ -55,6 +55,9 @@ target-version = "py312"
 select = ["E", "F", "I", "B", "UP", "S"]
 ignore = ["S101"]
 
+[tool.vercel]
+entrypoint = "apps.api.app:app"
+
 [tool.pytest.ini_options]
 pythonpath = ["apps/api/src"]
 testpaths = ["tests"]
