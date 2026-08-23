@@ -20,6 +20,37 @@ The repository currently contains the first end-to-end vertical slice:
 
 The next milestones add the official UniHack reference pack, PostgreSQL persistence, durable workflows, manufacturer-source retrieval, document intelligence, evidence verification, human review, and exact Expected Output export.
 
+## Permanent deployment and live sample evidence
+
+The current ForgeGraph vertical slice is permanently deployed and connected to this repository. Open the live control tower at [forgegraph-unihack-hack2skill.vercel.app](https://forgegraph-unihack-hack2skill.vercel.app/) and the public API at [forgegraph-api-root.vercel.app](https://forgegraph-api-root.vercel.app/). Both services deploy from the `master` branch through Vercel.
+
+### Deployment snapshot
+
+![ForgeGraph permanent deployment homepage](docs/assets/deployment-home.png)
+
+The screenshot above was captured from the permanent public website before a catalog upload. It shows the ForgeGraph ingest workflow, trust dashboard, evidence-backed governance positioning, and the Zen Z team attribution.
+
+### UniHack sample input and live output
+
+The attached 1,000-row UniHack sample is checked in as [`demo/Unihack_SampleDataset-Input.csv`](demo/Unihack_SampleDataset-Input.csv). It was uploaded to the permanent API after adding mappings for the official sample headers (`Mfg_Part_Num`, `Part_Desc`, and `Part_Manuf`) and explicit no-brand placeholders. The raw response is preserved in [`docs/assets/unihack-sample-job-response.json`](docs/assets/unihack-sample-job-response.json).
+
+| Output field | Live result |
+|---|---:|
+| Job status | `waiting_review` |
+| Total rows | 1,000 |
+| Processed rows | 1,000 |
+| Accepted rows | 0 |
+| Review-required rows | 1,000 |
+| Failed rows | 0 |
+| Claims generated | 3,000 |
+| Claims with evidence | 0 |
+| Validation errors | 0 |
+| Evidence coverage | 0% |
+
+![ForgeGraph live sample output dashboard](docs/assets/sample-output-dashboard.png)
+
+The output snapshot above was captured from the real deployed UI after uploading the sample. The result is intentionally conservative: the starter development reference pack does not contain the sample’s manufacturer master data, and the sample explicitly marks brand fields as unbranded or unavailable. ForgeGraph therefore routes all 1,000 rows to human review rather than publishing unsupported manufacturer or brand claims. This is a governance result, not a benchmark score; the official reference pack, evidence retrieval, and exact Expected Output exporter remain future milestones.
+
 ## Product architecture
 
 ```text
