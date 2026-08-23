@@ -63,6 +63,31 @@ class CatalogService:
     def get_job(self, job_id: UUID) -> CatalogJob | None:
         return self._jobs.get(job_id)
 
+    def export_csv(self, job_id: UUID) -> bytes:
+        job = self._jobs.get(job_id)
+        if job is None:
+            raise KeyError(job_id)
+        rows: list[dict[str, Any]] = []
+        for product in job.products:
+            rows.append(
+                {
+                    "product_id": product.product_id,
+                    "mpn": product.mpn,
+                    "manufacturer": product.manufacturer,
+                    "brand": product.brand,
+                    "category": product.category,
+                    "publish_status": product.publish_status,
+                    "claims_count": len(product.claims),
+                    "validation_errors": sum(
+                        item.status == "failed" for item in product.validations
+                    ),
+                }
+            )
+        frame = pd.DataFrame(rows)
+        stream = io.StringIO()
+        frame.to_csv(stream, index=False)
+        return stream.getvalue().encode("utf-8")
+
     def _process_file(self, filename: str, content: bytes) -> list[ProductRecord]:
         lower = filename.lower()
         if lower.endswith(".csv"):

@@ -7,6 +7,7 @@ from uuid import UUID
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 
 from forgegraph.catalog.models import CatalogJob, HealthResponse, JobResponse
 from forgegraph.catalog.service import CatalogService
@@ -90,6 +91,27 @@ def get_catalog_job(job_id: UUID) -> JobResponse:
     if job is None:
         raise HTTPException(status_code=404, detail="Catalog job not found.")
     return to_response(job)
+
+
+@app.get(f"{settings.api_prefix}/catalog/jobs/{{job_id}}/products", tags=["catalog"])
+def get_catalog_products(job_id: UUID) -> list[dict]:
+    job = catalog_service.get_job(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail="Catalog job not found.")
+    return [product.model_dump(mode="json") for product in job.products]
+
+
+@app.get(f"{settings.api_prefix}/catalog/jobs/{{job_id}}/export.csv", tags=["catalog"])
+def export_catalog_csv(job_id: UUID) -> Response:
+    try:
+        content = catalog_service.export_csv(job_id)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail="Catalog job not found.") from exc
+    return Response(
+        content=content,
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=forgegraph-{job_id}.csv"},
+    )
 
 
 @app.get(f"{settings.api_prefix}/catalog/jobs/{{job_id}}/quality-report", tags=["catalog"])
