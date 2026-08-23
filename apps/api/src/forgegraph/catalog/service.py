@@ -123,16 +123,46 @@ class CatalogService:
         return None, confidence, ["ambiguous_master_match"]
 
     def _process_row(self, row_number: int, row: dict[str, Any]) -> ProductRecord:
-        mpn = first_value(row, ("MPN", "Part Number", "Part Num", "Manufacturer Part Number"))
+        mpn = first_value(
+            row,
+            (
+                "MPN",
+                "Part Number",
+                "Part Num",
+                "Manufacturer Part Number",
+                "Mfg_Part_Num",
+            ),
+        )
         description = first_value(
             row,
-            ("Description", "Short Description", "Part Desc", "Product Description"),
+            (
+                "Description",
+                "Short Description",
+                "Part Desc",
+                "Product Description",
+                "Part_Desc",
+            ),
         )
         manufacturer_raw = first_value(
             row,
-            ("Manufacturer", "Part Manufacturer", "Mfg", "Mfg Name"),
+            (
+                "Manufacturer",
+                "Part Manufacturer",
+                "Mfg",
+                "Mfg Name",
+                "Part_Manuf",
+            ),
         )
-        brand_raw = first_value(row, ("Brand", "Brand Name"))
+        brand_raw = first_value(
+            row,
+            (
+                "Brand",
+                "Brand Name",
+                "E1_Brand",
+                "Unilog_Brand",
+                "DIB_Brand",
+            ),
+        )
         manufacturer, manufacturer_conf, manufacturer_reasons = self._resolve(
             manufacturer_raw,
             self._manufacturers,

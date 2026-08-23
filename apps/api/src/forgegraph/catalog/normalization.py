@@ -15,6 +15,8 @@ DEFAULT_PLACEHOLDERS = {
     "unknown",
     "not available",
     "-- no unilog brand --",
+    "-- no dib brand --",
+    "-- unbranded --",
     "-- no unilog manufacturer --",
 }
 
