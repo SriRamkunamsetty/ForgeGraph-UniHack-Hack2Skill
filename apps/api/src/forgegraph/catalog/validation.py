@@ -88,7 +88,15 @@ class QualityFirewall:
 
     @staticmethod
     def _is_technical(claim: Claim) -> bool:
-        return claim.attribute.casefold() not in {"description", "title", "keywords"}
+        return claim.attribute.casefold() not in {
+            "description",
+            "title",
+            "keywords",
+            "manufacturer",
+            "brand",
+            "mpn",
+            "category",
+        }
 
     @staticmethod
     def _failed(
