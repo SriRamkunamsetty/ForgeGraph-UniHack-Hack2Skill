@@ -1,0 +1,123 @@
+{
+  "connection_type": [
+    "Threaded", "Compression", "Push-to-Connect", "Solvent Cement", "Press Fit",
+    "Flanged", "Grooved", "Barbed", "Socket Weld", "Butt Weld", "Sweat",
+    "NPT", "BSPT", "BSPP", "Victaulic", "Crimp", "Expansion"
+  ],
+  "material": [
+    "Brass", "Bronze", "Copper", "Cast Iron", "Ductile Iron", "Stainless Steel 304",
+    "Stainless Steel 316", "Carbon Steel", "Galvanized Steel", "PVC", "CPVC",
+    "HDPE", "Polypropylene", "ABS", "Nylon", "Aluminum", "Lead-Free Brass",
+    "Red Brass", "Malleable Iron"
+  ],
+  "finish": [
+    "Chrome", "Polished Chrome", "Brushed Nickel", "Oil Rubbed Bronze",
+    "Matte Black", "Brushed Gold", "Galvanized", "Powder Coated",
+    "Electroplated", "Hot Dip Galvanized", "Zinc Plated", "Plain",
+    "PVC Coated", "Epoxy Coated", "Stainless"
+  ],
+  "end_type": [
+    "Male", "Female", "Male x Male", "Female x Female", "Male x Female",
+    "Sweat x Sweat", "Thread x Thread", "NPT x NPT", "Compression x Compression",
+    "Push x Push", "Barb x Barb"
+  ],
+  "thread_type": [
+    "NPT", "NPTF", "BSPT", "BSPP", "UNC", "UNF", "UNEF",
+    "Metric", "SAE", "ACME"
+  ],
+  "valve_type": [
+    "Ball Valve", "Gate Valve", "Globe Valve", "Check Valve", "Butterfly Valve",
+    "Needle Valve", "Diaphragm Valve", "Plug Valve", "Relief Valve",
+    "Pressure Reducing Valve", "Solenoid Valve", "Foot Valve"
+  ],
+  "actuation_type": [
+    "Manual", "Electric", "Pneumatic", "Hydraulic", "Spring Return",
+    "Double Acting", "Single Acting"
+  ],
+  "faucet_type": [
+    "Kitchen", "Bathroom", "Utility", "Laundry", "Bar", "Commercial", "Industrial"
+  ],
+  "handle_type": [
+    "Single Handle", "Double Handle", "Lever", "Cross Handle", "Knob"
+  ],
+  "installation_type": [
+    "Deck Mount", "Wall Mount", "Floor Mount", "Vessel", "Under Mount"
+  ],
+  "certification": [
+    "NSF 61", "NSF 372", "UL", "CSA", "ADA", "WaterSense", "ASME A112.18.1",
+    "ASSE 1070", "ANSI", "IAMPO"
+  ],
+  "fastener_type": [
+    "Hex Bolt", "Hex Cap Screw", "Carriage Bolt", "Anchor Bolt", "Stud Bolt",
+    "Machine Screw", "Wood Screw", "Sheet Metal Screw", "Self-Drilling Screw",
+    "Lag Screw", "Eye Bolt", "U-Bolt", "J-Bolt", "Hex Nut", "Wing Nut",
+    "Lock Nut", "Flat Washer", "Lock Washer", "Spring Washer"
+  ],
+  "head_type": [
+    "Hex", "Round", "Pan", "Flat", "Oval", "Truss", "Binding", "Fillister",
+    "Wafer", "Bugle", "Cheese"
+  ],
+  "drive_type": [
+    "Slotted", "Phillips", "Combination", "Hex Socket", "Torx", "Square",
+    "Pozidriv", "Tri-Wing", "Spanner"
+  ],
+  "grade": [
+    "Grade 2", "Grade 5", "Grade 8", "SAE J429 Grade 2", "SAE J429 Grade 5",
+    "SAE J429 Grade 8", "ASTM A307", "ASTM A325", "ASTM A490",
+    "Stainless 18-8", "Stainless 316", "Class 8.8", "Class 10.9", "Class 12.9"
+  ],
+  "conduit_type": [
+    "EMT", "IMC", "RMC", "PVC Schedule 40", "PVC Schedule 80",
+    "FMC", "LFMC", "LFNC", "ENT"
+  ],
+  "enclosure_type": [
+    "TEFC", "ODP", "TENV", "TEAO", "XPFC", "WPI", "WPII",
+    "IP44", "IP54", "IP55", "IP65", "IP66", "NEMA 1", "NEMA 4",
+    "NEMA 4X", "NEMA 12"
+  ],
+  "phase": [
+    "1 Phase", "3 Phase", "Single Phase", "Three Phase"
+  ],
+  "pump_type": [
+    "Centrifugal", "Submersible", "Sump", "Sewage", "Booster", "Circulator",
+    "Multistage", "Self-Priming", "Gear Pump", "Diaphragm Pump", "Peristaltic"
+  ],
+  "bearing_type": [
+    "Deep Groove Ball Bearing", "Angular Contact Ball Bearing",
+    "Self-Aligning Ball Bearing", "Cylindrical Roller Bearing",
+    "Tapered Roller Bearing", "Spherical Roller Bearing",
+    "Thrust Ball Bearing", "Needle Roller Bearing"
+  ],
+  "seal_type": [
+    "Open", "Shielded", "Sealed", "Non-Contact Seal", "Contact Seal"
+  ],
+  "conductor_type": [
+    "Copper", "Aluminum", "Tinned Copper", "Bare Copper"
+  ],
+  "insulation_type": [
+    "THHN", "THWN", "THWN-2", "XHHW", "USE-2", "NM-B", "MC", "SJ",
+    "SJO", "SO", "SOW", "SOOW", "PVC", "XLPE", "EPR"
+  ],
+  "lamp_type": [
+    "LED", "Fluorescent", "HID", "Metal Halide", "High Pressure Sodium",
+    "Low Pressure Sodium", "Incandescent", "Halogen", "Compact Fluorescent"
+  ],
+  "base_type": [
+    "E26 Medium", "E39 Mogul", "GU24", "GU10", "G13 T8", "G5 T5",
+    "G23", "2G11", "Recessed Double Contact", "Medium Bi-Pin",
+    "Miniature Bi-Pin", "Single Pin"
+  ],
+  "color_temperature": [
+    "2700K", "3000K", "3500K", "4000K", "5000K", "5700K", "6500K"
+  ],
+  "dimmable": [
+    "Yes", "No", "0-10V", "TRIAC", "Phase Dimming"
+  ],
+  "standard": [
+    "ANSI", "ASTM", "ASME", "ISO", "DIN", "BS", "EN", "NEMA",
+    "UL", "CSA", "IEC", "SAE", "AWS", "AWWA", "NSF", "MSS"
+  ],
+  "efficiency_class": [
+    "IE1", "IE2", "IE3", "IE4", "NEMA Premium", "EPAct", "Standard"
+  ]
+}

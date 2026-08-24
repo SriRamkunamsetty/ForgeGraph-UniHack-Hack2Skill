@@ -16,7 +16,7 @@ class ReferencePack:
     brands: list[str]
     expected_output_headers: list[str]
     lovs: dict[str, list[str]]
-    uoms: dict[str, list[str]]
+    uoms: dict[str, Any]
     taxonomy: list[dict[str, Any]]
     content_guidelines: dict[str, Any]
 
@@ -41,7 +41,7 @@ class ReferencePackLoader:
         brands = self._read_required_list(pack_dir / artifacts["brand_master"])
         expected_output = self._read_optional(pack_dir, artifacts.get("expected_output_schema"))
         lovs = self._read_optional(pack_dir, artifacts.get("lov"))
-        uoms = self._read_optional(pack_dir, artifacts.get("uom"))
+        raw_uoms = self._read_optional(pack_dir, artifacts.get("uom"))
         taxonomy = self._read_optional(pack_dir, artifacts.get("taxonomy"))
         guidelines = self._read_optional(pack_dir, artifacts.get("content_guidelines"))
         return ReferencePack(
@@ -51,7 +51,7 @@ class ReferencePackLoader:
             brands=[str(item) for item in brands],
             expected_output_headers=self._headers(expected_output),
             lovs=self._mapping_of_lists(lovs),
-            uoms=self._mapping_of_lists(uoms),
+            uoms=dict(raw_uoms) if isinstance(raw_uoms, dict) else {},
             taxonomy=self._mapping_of_records(taxonomy),
             content_guidelines=guidelines if isinstance(guidelines, dict) else {},
         )

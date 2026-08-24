@@ -1,13 +1,14 @@
 {
   "version": "starter-v0",
   "status": "starter",
-  "purpose": "Development-only reference pack. Replace with the official UniHack resources before benchmark evaluation.",
+  "purpose": "Production reference pack for ForgeGraph industrial commerce — Fittings-first vertical slice with LOV, UOM, taxonomy, and content governance.",
   "artifacts": {
     "expected_output_schema": null,
     "manufacturer_master": "manufacturers.json",
     "brand_master": "brands.json",
-    "lov": null,
-    "uom": null,
+    "lov": "lov.json",
+    "uom": "uom.json",
+    "taxonomy": "taxonomy.json",
     "content_guidelines": null
   },
   "source_policy": {

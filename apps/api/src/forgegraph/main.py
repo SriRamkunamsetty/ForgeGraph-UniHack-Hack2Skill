@@ -280,14 +280,39 @@ def get_quality_report(
     job = catalog_service.get_job(job_id)
     if job is None or job.tenant_id != tenant_from_header(x_tenant_id):
         raise HTTPException(status_code=404, detail="Catalog job not found.")
+    # Build category distribution
+    category_dist: dict[str, int] = {}
+    for product in job.products:
+        cat = product.category or "Uncategorized"
+        category_dist[cat] = category_dist.get(cat, 0) + 1
+    # Build claim health
+    all_claims = [c for p in job.products for c in p.claims]
+    claim_health = {
+        "accepted": sum(c.status.value == "accepted" for c in all_claims),
+        "review_required": sum(c.status.value == "review_required" for c in all_claims),
+        "unresolved": sum(c.status.value == "unresolved" for c in all_claims),
+        "candidate": sum(c.status.value == "candidate" for c in all_claims),
+        "rejected": sum(c.status.value == "rejected" for c in all_claims),
+    }
+    # Validation breakdown
+    all_validations = [v for p in job.products for v in p.validations]
+    validation_breakdown = {
+        "errors": sum(v.severity == "error" and v.status == "failed" for v in all_validations),
+        "warnings": sum(v.severity == "warning" and v.status == "failed" for v in all_validations),
+        "by_rule": {},
+    }
+    for v in all_validations:
+        validation_breakdown["by_rule"][v.rule_id] = (
+            validation_breakdown["by_rule"].get(v.rule_id, 0) + 1
+        )
     return {
         "job_id": str(job.id),
         "status": job.status,
+        "reference_pack_version": job.reference_pack_version,
         "quality": job.quality.model_dump(mode="json"),
-        "message": (
-            "This report is generated from the current vertical slice; "
-            "reference-pack validation is being expanded."
-        ),
+        "category_distribution": category_dist,
+        "claim_health": claim_health,
+        "validation_breakdown": validation_breakdown,
     }
 
 
@@ -413,6 +438,26 @@ def decide_review(
         raise HTTPException(status_code=409, detail=str(exc)) from exc
     if task is None:
         raise HTTPException(status_code=404, detail="Review task not found.")
+
+    # --- FIX: Update the product publish_status in the CatalogJob ---
+    job = catalog_service.get_job(task.job_id)
+    if job is not None and job.tenant_id == tenant_id:
+        for product in job.products:
+            if product.product_id == task.product_id:
+                from forgegraph.review.models import ReviewStatus
+                if request.decision == ReviewStatus.APPROVED:
+                    product.publish_status = "ready"
+                elif request.decision == ReviewStatus.REJECTED:
+                    product.publish_status = "blocked"
+                # Apply any edited values to the product record
+                if request.edited_values:
+                    for attr, val in request.edited_values.items():
+                        if hasattr(product, attr):
+                            setattr(product, attr, val)
+                break
+        catalog_service.recalculate_quality(job)
+    # -------------------------------------------------------------------
+
     audit_service.record(
         tenant_id,
         actor,

@@ -1,0 +1,121 @@
+{
+  "length": {
+    "canonical": "in",
+    "aliases": {
+      "in": "in", "inch": "in", "inches": "in", "\"": "in",
+      "ft": "ft", "foot": "ft", "feet": "ft", "'": "ft",
+      "mm": "mm", "millimeter": "mm", "millimeters": "mm", "millimetre": "mm",
+      "cm": "cm", "centimeter": "cm", "centimeters": "cm", "centimetre": "cm",
+      "m": "m", "meter": "m", "meters": "m", "metre": "m", "metres": "m"
+    }
+  },
+  "pressure": {
+    "canonical": "psi",
+    "aliases": {
+      "psi": "psi", "lbs/sq in": "psi", "lb/in2": "psi", "pounds per square inch": "psi",
+      "bar": "bar", "bars": "bar",
+      "kpa": "kPa", "kilopascal": "kPa", "kilopascals": "kPa",
+      "mpa": "MPa", "megapascal": "MPa", "megapascals": "MPa",
+      "psig": "psig", "psia": "psia"
+    }
+  },
+  "temperature": {
+    "canonical": "°F",
+    "aliases": {
+      "°f": "°F", "f": "°F", "fahrenheit": "°F", "deg f": "°F", "deg. f": "°F",
+      "°c": "°C", "c": "°C", "celsius": "°C", "centigrade": "°C", "deg c": "°C",
+      "k": "K", "kelvin": "K"
+    }
+  },
+  "weight": {
+    "canonical": "lb",
+    "aliases": {
+      "lb": "lb", "lbs": "lb", "pound": "lb", "pounds": "lb",
+      "oz": "oz", "ounce": "oz", "ounces": "oz",
+      "kg": "kg", "kilogram": "kg", "kilograms": "kg", "kilo": "kg",
+      "g": "g", "gram": "gram", "grams": "g",
+      "ton": "ton", "tons": "ton", "tonne": "tonne", "tonnes": "tonne"
+    }
+  },
+  "flow_rate": {
+    "canonical": "GPM",
+    "aliases": {
+      "gpm": "GPM", "gal/min": "GPM", "gallons per minute": "GPM",
+      "gph": "GPH", "gal/hr": "GPH", "gallons per hour": "GPH",
+      "lpm": "LPM", "l/min": "LPM", "liters per minute": "LPM", "litres per minute": "LPM",
+      "cfm": "CFM", "cubic feet per minute": "CFM",
+      "m3/h": "m³/h", "m3/hr": "m³/h", "cubic meters per hour": "m³/h"
+    }
+  },
+  "voltage": {
+    "canonical": "V",
+    "aliases": {
+      "v": "V", "volt": "V", "volts": "V",
+      "kv": "kV", "kilovolt": "kV", "kilovolts": "kV",
+      "mv": "mV", "millivolt": "mV", "millivolts": "mV",
+      "vac": "VAC", "vdc": "VDC"
+    }
+  },
+  "current": {
+    "canonical": "A",
+    "aliases": {
+      "a": "A", "amp": "A", "amps": "A", "ampere": "A", "amperes": "A",
+      "ma": "mA", "milliamp": "mA", "milliamps": "mA",
+      "ka": "kA", "kiloamp": "kA"
+    }
+  },
+  "power": {
+    "canonical": "W",
+    "aliases": {
+      "w": "W", "watt": "W", "watts": "W",
+      "kw": "kW", "kilowatt": "kW", "kilowatts": "kW",
+      "mw": "MW", "megawatt": "MW",
+      "hp": "HP", "h.p.": "HP", "horsepower": "HP",
+      "va": "VA", "kva": "kVA",
+      "btu/hr": "BTU/hr", "btu": "BTU"
+    }
+  },
+  "frequency": {
+    "canonical": "Hz",
+    "aliases": {
+      "hz": "Hz", "hertz": "Hz",
+      "khz": "kHz", "kilohertz": "kHz",
+      "mhz": "MHz", "megahertz": "MHz"
+    }
+  },
+  "pipe_size": {
+    "canonical": "in",
+    "aliases": {
+      "in": "in", "inch": "in", "inches": "in", "\"": "in",
+      "dn": "DN", "nominal": "in", "nps": "NPS"
+    }
+  },
+  "torque": {
+    "canonical": "ft·lb",
+    "aliases": {
+      "ft-lb": "ft·lb", "ft lb": "ft·lb", "foot pound": "ft·lb", "foot-pound": "ft·lb",
+      "in-lb": "in·lb", "in lb": "in·lb", "inch pound": "in·lb",
+      "nm": "N·m", "n.m": "N·m", "newton meter": "N·m", "newton-meter": "N·m"
+    }
+  },
+  "thread_size": {
+    "canonical": "in",
+    "aliases": {
+      "in": "in", "inch": "in", "\"": "in",
+      "mm": "mm", "m": "M"
+    }
+  },
+  "illuminance": {
+    "canonical": "lm",
+    "aliases": {
+      "lm": "lm", "lumen": "lm", "lumens": "lm",
+      "lux": "lx", "lx": "lx", "fc": "fc", "foot-candle": "fc"
+    }
+  },
+  "speed": {
+    "canonical": "RPM",
+    "aliases": {
+      "rpm": "RPM", "r/min": "RPM", "rev/min": "RPM", "revolutions per minute": "RPM"
+    }
+  }
+}

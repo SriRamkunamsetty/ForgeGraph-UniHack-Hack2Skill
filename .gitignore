@@ -20,6 +20,7 @@ build/
 .next/
 out/
 node_modules/
+*.tsbuildinfo
 
 # Local storage
 .local-data/

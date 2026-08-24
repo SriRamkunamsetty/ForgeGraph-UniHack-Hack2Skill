@@ -1,0 +1,92 @@
+[
+  {
+    "id": "fittings",
+    "name": "Fittings",
+    "classpath": "Industrial/Pipe & Fittings/Fittings",
+    "attributes": [
+      "connection_type", "material", "size", "pressure_rating", "temperature_rating",
+      "end_type", "thread_type", "finish", "standard", "fitting_type"
+    ]
+  },
+  {
+    "id": "faucets",
+    "name": "Faucets",
+    "classpath": "Industrial/Plumbing/Faucets",
+    "attributes": [
+      "faucet_type", "finish", "material", "connection_type", "flow_rate",
+      "handle_type", "spout_reach", "installation_type", "certification"
+    ]
+  },
+  {
+    "id": "valves",
+    "name": "Valves",
+    "classpath": "Industrial/Pipe & Fittings/Valves",
+    "attributes": [
+      "valve_type", "material", "size", "pressure_rating", "temperature_rating",
+      "connection_type", "actuation_type", "end_connection", "cv_value", "standard"
+    ]
+  },
+  {
+    "id": "fasteners",
+    "name": "Fasteners",
+    "classpath": "Industrial/Fasteners & Hardware/Fasteners",
+    "attributes": [
+      "fastener_type", "material", "finish", "thread_size", "thread_pitch",
+      "length", "head_type", "drive_type", "grade", "standard"
+    ]
+  },
+  {
+    "id": "electrical_conduit",
+    "name": "Electrical Conduit",
+    "classpath": "Industrial/Electrical/Conduit & Fittings",
+    "attributes": [
+      "conduit_type", "material", "trade_size", "length", "finish",
+      "standard", "connection_type"
+    ]
+  },
+  {
+    "id": "motors",
+    "name": "Electric Motors",
+    "classpath": "Industrial/Electrical/Motors",
+    "attributes": [
+      "motor_type", "horsepower", "voltage", "phase", "rpm", "frame",
+      "enclosure_type", "efficiency_class", "frequency", "service_factor"
+    ]
+  },
+  {
+    "id": "pumps",
+    "name": "Pumps",
+    "classpath": "Industrial/Fluid Handling/Pumps",
+    "attributes": [
+      "pump_type", "flow_rate", "head_pressure", "horsepower", "voltage",
+      "material", "connection_size", "phase", "rpm", "enclosure_type"
+    ]
+  },
+  {
+    "id": "bearings",
+    "name": "Bearings",
+    "classpath": "Industrial/Power Transmission/Bearings",
+    "attributes": [
+      "bearing_type", "bore_diameter", "outer_diameter", "width", "material",
+      "seal_type", "radial_load", "axial_load", "speed_rating", "standard"
+    ]
+  },
+  {
+    "id": "wire_cable",
+    "name": "Wire & Cable",
+    "classpath": "Industrial/Electrical/Wire & Cable",
+    "attributes": [
+      "conductor_type", "gauge", "voltage_rating", "insulation_type", "jacket_material",
+      "number_of_conductors", "standard", "temperature_rating", "color"
+    ]
+  },
+  {
+    "id": "lighting",
+    "name": "Lighting",
+    "classpath": "Industrial/Electrical/Lighting",
+    "attributes": [
+      "lamp_type", "wattage", "lumens", "color_temperature", "voltage",
+      "base_type", "beam_angle", "efficacy", "lifespan", "dimmable"
+    ]
+  }
+]
