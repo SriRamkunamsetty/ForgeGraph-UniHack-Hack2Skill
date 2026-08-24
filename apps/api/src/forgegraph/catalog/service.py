@@ -2,13 +2,16 @@ from __future__ import annotations
 
 import hashlib
 import io
+from collections.abc import Iterable
 from datetime import UTC, datetime
+from pathlib import PurePath
 from typing import Any
 from uuid import UUID
 
 import pandas as pd
 from rapidfuzz import fuzz, process
 
+from forgegraph.artifacts.store import ArtifactStore
 from forgegraph.catalog.models import (
     CatalogJob,
     Claim,
@@ -19,7 +22,9 @@ from forgegraph.catalog.models import (
     ValidationResult,
 )
 from forgegraph.catalog.normalization import canonicalize_row, first_value, normalize_key
-from forgegraph.catalog.reference_pack import ReferencePackLoader
+from forgegraph.catalog.reference_pack import ReferencePack, ReferencePackLoader
+from forgegraph.catalog.validation import QualityFirewall
+from forgegraph.db.store import JobStore, MemoryJobStore
 
 
 class CatalogService:
@@ -29,26 +34,74 @@ class CatalogService:
     replaced by PostgreSQL and durable workflows without changing the API contract.
     """
 
-    def __init__(self) -> None:
-        self._jobs: dict[UUID, CatalogJob] = {}
-        pack = ReferencePackLoader().load("v1")
-        self._manufacturers = pack.manufacturers
-        self._brands = pack.brands
+    def __init__(
+        self,
+        store: JobStore | None = None,
+        artifacts: ArtifactStore | None = None,
+    ) -> None:
+        self._store = store or MemoryJobStore()
+        self._artifacts = artifacts
+        self._pack_loader = ReferencePackLoader()
+        self._pack_cache: dict[str, ReferencePack] = {}
 
     @staticmethod
     def sha256(content: bytes) -> str:
         return hashlib.sha256(content).hexdigest()
 
-    def create_job(self, filename: str, content: bytes, reference_pack_version: str) -> CatalogJob:
+    def create_job(
+        self,
+        filename: str,
+        content: bytes,
+        reference_pack_version: str,
+        tenant_id: str = "local",
+    ) -> CatalogJob:
+        job = self.create_pending_job(filename, content, reference_pack_version, tenant_id)
+        return self.process_job(job.id)
+
+    def create_pending_job(
+        self,
+        filename: str,
+        content: bytes,
+        reference_pack_version: str,
+        tenant_id: str = "local",
+    ) -> CatalogJob:
+        self._get_pack(reference_pack_version)
         job = CatalogJob(
+            tenant_id=tenant_id,
             filename=filename,
             input_sha256=self.sha256(content),
             reference_pack_version=reference_pack_version,
-            status=JobStatus.RUNNING,
+            status=JobStatus.CREATED,
         )
-        self._jobs[job.id] = job
+        input_object_key: str | None = None
+        if self._artifacts is not None:
+            safe_name = PurePath(filename).name
+            stored = self._artifacts.put(
+                f"inputs/{job.id}/{safe_name}",
+                content,
+                "application/octet-stream",
+            )
+            input_object_key = stored.key
+        job.input_object_key = input_object_key
+        self._store.save(job, input_object_key)
+        return job
+
+    def process_job(self, job_id: UUID) -> CatalogJob:
+        job = self._store.get(job_id)
+        if job is None:
+            raise KeyError(job_id)
+        if job.status in {JobStatus.COMPLETED, JobStatus.WAITING_REVIEW}:
+            return job
+        if self._artifacts is None or not job.input_object_key:
+            raise RuntimeError("A durable input artifact is required for worker processing.")
+        job.status = JobStatus.RUNNING
+        job.error = None
+        self._store.save(job, job.input_object_key)
         try:
-            job.products = self._process_file(filename, content)
+            content = self._artifacts.get(job.input_object_key)
+            job.products = self._process_file(
+                job.filename, content, self._get_pack(job.reference_pack_version)
+            )
             job.quality = self._quality_summary(job.products)
             job.status = (
                 JobStatus.WAITING_REVIEW if job.quality.review_rows else JobStatus.COMPLETED
@@ -57,38 +110,110 @@ class CatalogService:
             job.status = JobStatus.FAILED
             job.error = f"{type(exc).__name__}: {exc}"
         job.updated_at = datetime.now(UTC)
-        self._jobs[job.id] = job
+        self._store.save(job, job.input_object_key)
         return job
 
     def get_job(self, job_id: UUID) -> CatalogJob | None:
-        return self._jobs.get(job_id)
+        return self._store.get(job_id)
+
+    def list_jobs(self, tenant_id: str = "local") -> Iterable[CatalogJob]:
+        return self._store.list(tenant_id)
+
+    def save_job(self, job: CatalogJob) -> CatalogJob:
+        job.updated_at = datetime.now(UTC)
+        self._store.save(job, job.input_object_key)
+        return job
+
+    def recalculate_quality(self, job: CatalogJob) -> CatalogJob:
+        job.quality = self._quality_summary(job.products)
+        if job.status not in {JobStatus.FAILED, JobStatus.CANCELLED}:
+            job.status = (
+                JobStatus.WAITING_REVIEW if job.quality.review_rows else JobStatus.COMPLETED
+            )
+        return self.save_job(job)
 
     def export_csv(self, job_id: UUID) -> bytes:
-        job = self._jobs.get(job_id)
-        if job is None:
-            raise KeyError(job_id)
-        rows: list[dict[str, Any]] = []
-        for product in job.products:
-            rows.append(
-                {
-                    "product_id": product.product_id,
-                    "mpn": product.mpn,
-                    "manufacturer": product.manufacturer,
-                    "brand": product.brand,
-                    "category": product.category,
-                    "publish_status": product.publish_status,
-                    "claims_count": len(product.claims),
-                    "validation_errors": sum(
-                        item.status == "failed" for item in product.validations
-                    ),
-                }
-            )
-        frame = pd.DataFrame(rows)
+        frame = self._export_frame(job_id)
         stream = io.StringIO()
         frame.to_csv(stream, index=False)
         return stream.getvalue().encode("utf-8")
 
-    def _process_file(self, filename: str, content: bytes) -> list[ProductRecord]:
+    def export_xlsx(self, job_id: UUID) -> bytes:
+        frame = self._export_frame(job_id)
+        stream = io.BytesIO()
+        with pd.ExcelWriter(stream, engine="openpyxl") as writer:
+            frame.to_excel(writer, index=False, sheet_name="products")
+        return stream.getvalue()
+
+    def _export_frame(self, job_id: UUID) -> pd.DataFrame:
+        job = self._store.get(job_id)
+        if job is None:
+            raise KeyError(job_id)
+        pack = self._get_pack(job.reference_pack_version)
+        rows: list[dict[str, Any]] = []
+        for product in job.products:
+            if pack.expected_output_headers:
+                rows.append(
+                    {
+                        header: self._value_for_header(product, header)
+                        for header in pack.expected_output_headers
+                    }
+                )
+            else:
+                rows.append(
+                    {
+                        "product_id": product.product_id,
+                        "mpn": product.mpn,
+                        "manufacturer": product.manufacturer,
+                        "brand": product.brand,
+                        "category": product.category,
+                        "publish_status": product.publish_status,
+                        "claims_count": len(product.claims),
+                        "validation_errors": sum(
+                            item.status == "failed" for item in product.validations
+                        ),
+                    }
+                )
+        columns = pack.expected_output_headers or None
+        return pd.DataFrame(rows, columns=columns)
+
+    @staticmethod
+    def _value_for_header(product: ProductRecord, header: str) -> Any:
+        key = normalize_key(header)
+        canonical = {
+            "productid": product.product_id,
+            "mpn": product.mpn,
+            "manufacturer": product.manufacturer,
+            "brand": product.brand,
+            "category": product.category,
+            "publishstatus": product.publish_status,
+        }
+        if key in canonical:
+            return canonical[key]
+        raw_values = {normalize_key(name): value for name, value in product.raw.items()}
+        if key in raw_values:
+            return raw_values[key]
+        for claim in product.claims:
+            if normalize_key(claim.attribute) == key:
+                return claim.normalized_value
+        return None
+
+    def _get_pack(self, version: str) -> ReferencePack:
+        if version in self._pack_cache:
+            return self._pack_cache[version]
+        load_version = "v1" if version == "starter-v0" else version
+        if not (self._pack_loader.root / load_version).exists():
+            raise ValueError(f"Reference-pack version is not available: {version}")
+        pack = self._pack_loader.load(load_version)
+        self._pack_cache[version] = pack
+        return pack
+
+    def _process_file(
+        self,
+        filename: str,
+        content: bytes,
+        pack: ReferencePack,
+    ) -> list[ProductRecord]:
         lower = filename.lower()
         if lower.endswith(".csv"):
             dataframe = pd.read_csv(io.BytesIO(content))
@@ -99,7 +224,7 @@ class CatalogService:
         dataframe = dataframe.where(pd.notna(dataframe), None)
         products: list[ProductRecord] = []
         for row_number, raw_row in enumerate(dataframe.to_dict(orient="records"), start=2):
-            products.append(self._process_row(row_number, canonicalize_row(raw_row)))
+            products.append(self._process_row(row_number, canonicalize_row(raw_row), pack))
         return products
 
     def _resolve(
@@ -122,7 +247,12 @@ class CatalogService:
             return candidate, confidence, ["fuzzy_master_match"]
         return None, confidence, ["ambiguous_master_match"]
 
-    def _process_row(self, row_number: int, row: dict[str, Any]) -> ProductRecord:
+    def _process_row(
+        self,
+        row_number: int,
+        row: dict[str, Any],
+        pack: ReferencePack,
+    ) -> ProductRecord:
         mpn = first_value(
             row,
             (
@@ -165,9 +295,9 @@ class CatalogService:
         )
         manufacturer, manufacturer_conf, manufacturer_reasons = self._resolve(
             manufacturer_raw,
-            self._manufacturers,
+            pack.manufacturers,
         )
-        brand, brand_conf, brand_reasons = self._resolve(brand_raw, self._brands)
+        brand, brand_conf, brand_reasons = self._resolve(brand_raw, pack.brands)
         product_id = mpn or f"row-{row_number}"
         claims: list[Claim] = []
         validations: list[ValidationResult] = []
@@ -245,7 +375,7 @@ class CatalogService:
             item.severity == "error" and item.status == "failed" for item in validations
         )
         needs_review = any(claim.status == ClaimStatus.REVIEW_REQUIRED for claim in claims)
-        return ProductRecord(
+        product = ProductRecord(
             product_id=product_id,
             mpn=mpn,
             manufacturer=manufacturer,
@@ -258,6 +388,12 @@ class CatalogService:
                 "blocked" if has_error else "review_required" if needs_review else "ready"
             ),
         )
+        product.validations = QualityFirewall(pack).validate_product(product)
+        if any(
+            item.severity == "error" and item.status == "failed" for item in product.validations
+        ):
+            product.publish_status = "blocked"
+        return product
 
     @staticmethod
     def _quality_summary(products: list[ProductRecord]) -> QualitySummary:

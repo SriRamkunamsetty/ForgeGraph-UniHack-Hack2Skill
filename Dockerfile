@@ -11,11 +11,13 @@ RUN useradd --create-home --uid 10001 forgegraph
 
 COPY pyproject.toml README.md /app/
 COPY apps/api /app/apps/api
+COPY migrations /app/migrations
+COPY alembic.ini /app/alembic.ini
 COPY reference-pack /app/reference-pack
 
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir . \
-    && pip install --no-cache-dir '.[dev]'
+    && rm -rf /root/.cache
 
 USER forgegraph
 EXPOSE 8080

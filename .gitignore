@@ -23,7 +23,15 @@ node_modules/
 
 # Local storage
 .local-data/
+.forgegraph-data/
 *.sqlite3
+
+# Terraform state and secrets
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!terraform.tfvars.example
 
 # IDE / OS
 .vscode/

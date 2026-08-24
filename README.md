@@ -254,42 +254,32 @@ The result is intentionally conservative. The development starter reference pack
 
 ## Current implementation status
 
-Implemented now:
+The repository now contains the production implementation path as well as the permanent demo. The code includes a PostgreSQL job store and Alembic migration, a Google Cloud Storage artifact adapter, Cloud Tasks dispatch with a protected worker endpoint, versioned reference-pack loading and importing, deterministic quality-firewall rules, exact-schema-aware CSV/XLSX export, SSRF-aware manufacturer evidence retrieval, PDF/HTML text extraction, structured Vertex AI/OpenAI-compatible claim extraction, risk-ranked human review tasks, tenant-scoped audit events, optional OIDC/JWT enforcement, Prometheus-compatible metrics, a polling control tower, review actions, and GCP Terraform plus deployment automation.
 
-- CSV/XLSX upload validation with configured size and extension controls.
-- SHA-256 identity for the original input artifact.
-- Header alias mapping and placeholder normalization.
-- Manufacturer and brand master-data matching with exact/fuzzy reason codes.
-- Atomic product claims and deterministic validation results.
-- Row-level `ready`, `review_required`, and `blocked` decisions.
-- Quality summary and evidence-coverage reporting.
-- Product inspection and CSV export endpoints.
-- FastAPI API and Next.js control-tower UI.
-- Permanent Vercel deployments connected to GitHub.
+The seven-stage workflow is executable through the service boundaries: ingest creates an immutable artifact and job identity; normalization resolves source fields and master data; classification is constrained by a versioned taxonomy; evidence retrieval accepts only approved manufacturer domains; extraction is schema-constrained and can abstain; validation and review enforce publication gates; and CSV/XLSX/API outputs are produced from the active reference-pack contract. Local development continues to default to memory and inline processing so the permanent public demo remains easy to run.
 
-Not yet production-complete:
+The final operational rollout still requires a real GCP project with billing, authenticated deployment permissions, Cloud SQL and Cloud Storage resources, protected secrets, an approved manufacturer-domain allowlist, the official UniHack reference pack, a reviewed Vertex AI budget/model policy, and end-to-end acceptance tests against the provisioned services. These prerequisites cannot be fabricated or completed from this sandbox because no authenticated GCP project is available here. Use [`infra/gcp/README.md`](infra/gcp/README.md) and [`ci/deploy-gcp.sh`](ci/deploy-gcp.sh) for the controlled rollout.
 
-- PostgreSQL-backed persistence and durable job state.
-- Object-storage retention for original uploads and evidence documents.
-- Temporal/Redis worker execution for long-running jobs.
-- Official UniHack reference-pack importer and exact Expected Output exporter.
-- Manufacturer-domain retrieval, PDF/table/OCR extraction, and evidence entailment.
-- Fittings-specific taxonomy and attribute extraction.
-- Authentication, tenant isolation, RBAC, audit storage, observability, and rate limiting.
-
-The current deployment is therefore a permanent, demonstrable vertical slice rather than a claim that the entire enterprise platform is finished.
-
-## API surface in the vertical slice
+## API surface
 
 | Method | Endpoint | Purpose |
 |---|---|---|
 | `GET` | `/health/live` | Liveness check. |
-| `GET` | `/health/ready` | Readiness check. |
-| `POST` | `/api/v1/catalog/jobs` | Upload CSV/XLSX and create a catalog job. |
+| `GET` | `/health/ready` | Readiness check including PostgreSQL when enabled. |
+| `GET` | `/metrics` | Prometheus-compatible application counters. |
+| `POST` | `/api/v1/catalog/jobs` | Upload CSV/XLSX and create an inline or Cloud Tasks job. |
+| `GET` | `/api/v1/catalog/jobs` | List jobs for the tenant. |
 | `GET` | `/api/v1/catalog/jobs/{job_id}` | Retrieve job status and quality summary. |
 | `GET` | `/api/v1/catalog/jobs/{job_id}/products` | Inspect normalized products and claims. |
 | `GET` | `/api/v1/catalog/jobs/{job_id}/quality-report` | Retrieve the quality report. |
-| `GET` | `/api/v1/catalog/jobs/{job_id}/export.csv` | Download the vertical-slice CSV export. |
+| `GET` | `/api/v1/catalog/jobs/{job_id}/export.csv` | Download a schema-aware CSV export. |
+| `GET` | `/api/v1/catalog/jobs/{job_id}/export.xlsx` | Download a schema-aware XLSX export. |
+| `POST` | `/api/v1/evidence/fetch` | Fetch allowlisted manufacturer evidence and persist its metadata. |
+| `GET` | `/api/v1/evidence/sources` | List tenant-scoped evidence sources. |
+| `POST` | `/api/v1/catalog/jobs/{job_id}/extract-claims` | Run strict structured claim extraction from selected evidence. |
+| `GET` | `/api/v1/reviews` | List risk-ranked human review tasks. |
+| `POST` | `/api/v1/reviews/{task_id}/decision` | Approve or reject a review task and record the decision. |
+| `GET` | `/api/v1/audit` | List tenant-scoped audit events. |
 
 ## Local development
 

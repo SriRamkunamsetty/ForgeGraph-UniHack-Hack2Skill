@@ -57,3 +57,21 @@ h2 { margin-bottom: 9px; color: var(--navy); font-size: 25px; letter-spacing: -.
 footer { padding: 28px 0 0; color: var(--muted); font-size: 12px; letter-spacing: .04em; }
 @media (max-width: 900px) { .hero { flex-direction: column; } .hero-note { max-width: none; } .workspace-grid, .capability-row { grid-template-columns: 1fr; } }
 @media (max-width: 600px) { .shell { padding: 0 18px 24px; } .topbar { min-height: 60px; } .status-pill { display: none; } .hero { padding: 38px 0; } h1 { font-size: 43px; } .card { padding: 20px; } }
+
+.detail-grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 22px; margin-top: 22px; }
+.ledger-row { display: flex; justify-content: space-between; gap: 18px; padding: 14px 0; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+.ledger-row:last-child { border-bottom: 0; }
+.ledger-row strong, .ledger-row code { color: var(--navy); font-weight: 800; }
+.ledger-row code { max-width: 62%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+.export-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.export-actions a { padding: 9px 12px; border: 1px solid var(--line); color: var(--navy); font-size: 12px; font-weight: 800; text-decoration: none; }
+.export-actions a:hover { border-color: var(--blue); color: var(--blue); }
+.review-count { color: var(--blue); font-size: 11px; font-weight: 800; letter-spacing: .08em; }
+.review-task { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 15px 0; border-top: 1px solid var(--line); }
+.review-task strong, .review-task small { display: block; }
+.review-task strong { color: var(--navy); font-size: 13px; }
+.review-task small { margin-top: 5px; color: var(--muted); font-size: 11px; }
+.review-buttons { display: flex; gap: 7px; }
+.review-buttons button { padding: 7px 9px; border: 1px solid var(--line); background: white; color: var(--navy); font-size: 11px; font-weight: 800; cursor: pointer; }
+.review-buttons button:hover { border-color: var(--blue); color: var(--blue); }
+@media (max-width: 900px) { .detail-grid { grid-template-columns: 1fr; } }

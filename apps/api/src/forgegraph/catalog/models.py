@@ -103,6 +103,7 @@ class CatalogJob(BaseModel):
     error: str | None = None
     quality: QualitySummary = Field(default_factory=QualitySummary)
     products: list[ProductRecord] = Field(default_factory=list)
+    input_object_key: str | None = None
 
 
 class JobResponse(BaseModel):

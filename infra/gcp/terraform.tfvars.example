@@ -1,0 +1,16 @@
+project_id            = "your-gcp-project-id"
+region                = "us-central1"
+environment           = "staging"
+api_image             = "us-central1-docker.pkg.dev/your-gcp-project-id/forgegraph/forgegraph-api:replace-me"
+database_password     = "replace-with-a-secret"
+worker_token          = "replace-with-a-long-random-token"
+artifact_bucket_name  = "your-globally-unique-forgegraph-artifact-bucket"
+cors_origins          = "https://forgegraph-unihack-hack2skill.vercel.app"
+cloud_sql_tier        = "db-custom-2-7680"
+cloud_sql_disk_gb     = 50
+artifact_retention_days = 90
+cloud_run_cpu         = "2"
+cloud_run_memory      = "2Gi"
+cloud_run_max_instances = 20
+max_concurrent_tasks  = 10
+max_tasks_per_second  = 5

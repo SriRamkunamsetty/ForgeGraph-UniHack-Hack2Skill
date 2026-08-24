@@ -61,3 +61,69 @@ def test_catalog_job_rejects_unsupported_extension():
             files={"file": ("catalog.exe", b"unsafe", "application/octet-stream")},
         )
     assert response.status_code == 415
+
+
+def test_review_queue_and_xlsx_export_are_available():
+    dataframe = pd.DataFrame(
+        [
+            {
+                "Part Number": "FG-REVIEW-001",
+                "Description": "Review candidate",
+                "Manufacturer": "Unknown supplier",
+                "Brand": "Unknown brand",
+            }
+        ]
+    )
+    stream = io.BytesIO()
+    dataframe.to_csv(stream, index=False)
+    with TestClient(app) as client:
+        job_response = client.post(
+            "/api/v1/catalog/jobs",
+            files={"file": ("review.csv", stream.getvalue(), "text/csv")},
+        )
+        assert job_response.status_code == 200
+        job_id = job_response.json()["id"]
+        review_response = client.get("/api/v1/reviews")
+        assert review_response.status_code == 200
+        tasks = [task for task in review_response.json() if task["job_id"] == job_id]
+        assert tasks
+        decision_response = client.post(
+            f"/api/v1/reviews/{tasks[0]['id']}/decision",
+            json={"decision": "approved", "comment": "Verified by operator."},
+        )
+        assert decision_response.status_code == 200
+        xlsx_response = client.get(f"/api/v1/catalog/jobs/{job_id}/export.xlsx")
+        assert xlsx_response.status_code == 200
+        assert xlsx_response.content[:2] == b"PK"
+
+
+def test_reference_pack_importer_preserves_external_schema(tmp_path):
+    import json
+    from argparse import Namespace
+
+    from forgegraph.catalog.pack_importer import import_pack
+    from forgegraph.catalog.reference_pack import ReferencePackLoader
+
+    manufacturers = tmp_path / "manufacturers.json"
+    brands = tmp_path / "brands.json"
+    schema = tmp_path / "expected.json"
+    manufacturers.write_text(json.dumps(["Example Manufacturer"]))
+    brands.write_text(json.dumps(["Example Brand"]))
+    schema.write_text(json.dumps({"headers": ["Mfg_Part_Num", "Part_Desc", "Part_Manuf"]}))
+    destination = tmp_path / "packs"
+    import_pack(
+        Namespace(
+            version="official-v1",
+            destination=str(destination),
+            manufacturers=str(manufacturers),
+            brands=str(brands),
+            expected_output=str(schema),
+            lov=None,
+            uom=None,
+            taxonomy=None,
+            content_guidelines=None,
+            created_by="test",
+        )
+    )
+    pack = ReferencePackLoader(destination).load("official-v1")
+    assert pack.expected_output_headers == ["Mfg_Part_Num", "Part_Desc", "Part_Manuf"]

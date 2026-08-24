@@ -86,3 +86,13 @@ Before using ForgeGraph for operational production data, implement PostgreSQL-ba
 ## Custom domain
 
 A custom domain can be added to either Vercel project through its Domains settings. After DNS verification, update `NEXT_PUBLIC_API_BASE_URL` if the API domain changes and update `FORGEGRAPH_CORS_ORIGINS` to allow the final website origin. Re-run the public smoke tests after DNS and environment propagation.
+
+## GCP production deployment
+
+The production target is a containerized FastAPI service on Google Cloud Run, with Cloud SQL for PostgreSQL as the durable source of truth, a private versioned Cloud Storage bucket for uploads, evidence, and exports, Cloud Tasks for retryable catalog execution, Secret Manager for credentials, Artifact Registry for images, and Vertex AI for governed structured extraction. The Terraform foundation is in `infra/gcp/`, and the operator script is `ci/deploy-gcp.sh`.
+
+The seven-stage runtime contract is: (1) immutable ingest; (2) deterministic normalization and identity resolution; (3) versioned taxonomy classification; (4) manufacturer-only evidence retrieval; (5) structured claim extraction; (6) validation, contradiction handling, and human review; and (7) exact-schema publication. Stages are idempotent by job identity and are designed to be resumed by Cloud Tasks after transient failures.
+
+The GCP deployment requires a real GCP project with billing enabled, authenticated deployment permissions, a globally unique bucket name, protected database and worker secrets, an approved manufacturer-domain allowlist, and a reviewed Vertex AI model and budget policy. The sandbox cannot provision the user’s GCP project because no authenticated `gcloud` installation or project credentials are available in the current environment. The repository therefore contains the deployable implementation and infrastructure-as-code, while the final resource provisioning step must be executed against the user’s GCP project.
+
+Before enabling production, run `alembic upgrade head` through a controlled Cloud Run job, verify both health endpoints, upload representative CSV and XLSX files, inspect claims and evidence, make a review decision, download both export formats, and confirm that a new Cloud Run revision can read the same job after restart. Do not enable AI extraction until the official reference pack, source allowlist, retention policy, and model budget are approved.
