@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import hashlib
+import os
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
@@ -23,8 +25,13 @@ class ArtifactStore(Protocol):
 
 
 class LocalArtifactStore:
-    def __init__(self, root: str = ".forgegraph-data") -> None:
-        self.root = Path(root)
+    def __init__(self, root: str | None = None) -> None:
+        configured_root = root or os.getenv("FORGEGRAPH_DATA_DIR")
+        self.root = (
+            Path(configured_root)
+            if configured_root
+            else Path(tempfile.gettempdir()) / "forgegraph-data"
+        )
         self.root.mkdir(parents=True, exist_ok=True)
 
     def put(self, key: str, content: bytes, content_type: str) -> StoredArtifact:
